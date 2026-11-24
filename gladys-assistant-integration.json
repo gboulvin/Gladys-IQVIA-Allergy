@@ -1,0 +1,540 @@
+{
+  "manifest_version": 1,
+  "type": "device",
+  "name": "IQVIA Allergy",
+  "description": {
+    "en": "IQVIA pollen, asthma and cold & flu forecasts for your US ZIP codes.",
+    "fr": "Prévisions IQVIA de pollen, d'asthme et de rhume/grippe pour vos codes postaux US.",
+    "de": "IQVIA-Vorhersagen zu Pollen, Asthma und Erkältung für Ihre US-Postleitzahlen.",
+    "es": "Previsiones IQVIA de polen, asma y resfriado/gripe para sus códigos postales de EE. UU."
+  },
+  "version": "0.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-iqvia-allergy:0.0.0",
+  "gladys_version": ">=5.1.0",
+  "cover_image": "https://raw.githubusercontent.com/gboulvin/Gladys-IQVIA-Allergy/main/cover.png",
+  "categories": ["environment", "services"],
+  "transports": ["cloud"],
+  "config_schema": [
+    {
+      "key": "intro",
+      "type": "section",
+      "label": {
+        "en": "Getting started",
+        "fr": "Pour commencer",
+        "de": "Erste Schritte",
+        "es": "Primeros pasos"
+      },
+      "description": {
+        "en": "IQVIA publishes daily allergy (pollen), asthma and cold & flu forecasts for the United States, per ZIP code, on pollen.com. No account, no API key: enter the ZIP codes to follow.",
+        "fr": "IQVIA publie chaque jour des prévisions d'allergie (pollen), d'asthme et de rhume/grippe pour les États-Unis, par code postal, sur pollen.com. Pas de compte, pas de clé d'API : saisissez les codes postaux à suivre.",
+        "de": "IQVIA veröffentlicht auf pollen.com täglich Allergie- (Pollen), Asthma- sowie Erkältungs- und Grippevorhersagen für die USA, je Postleitzahl. Kein Konto, kein API-Schlüssel: Geben Sie die zu verfolgenden Postleitzahlen ein.",
+        "es": "IQVIA publica a diario previsiones de alergia (polen), asma y resfriado/gripe para Estados Unidos, por código postal, en pollen.com. Sin cuenta ni clave de API: introduzca los códigos postales que desea seguir."
+      },
+      "links": [
+        {
+          "url": "https://www.pollen.com",
+          "label": {
+            "en": "Pollen.com by IQVIA",
+            "fr": "Pollen.com par IQVIA",
+            "de": "Pollen.com von IQVIA",
+            "es": "Pollen.com de IQVIA"
+          }
+        }
+      ]
+    },
+    {
+      "key": "zip_codes",
+      "type": "string",
+      "label": {
+        "en": "ZIP codes",
+        "fr": "Codes postaux",
+        "de": "Postleitzahlen",
+        "es": "Códigos postales"
+      },
+      "description": {
+        "en": "One or more 5-digit US ZIP codes, separated by commas (5 at most). Each one gets a pollen, an asthma and a cold & flu device.",
+        "fr": "Un ou plusieurs codes postaux américains à 5 chiffres, séparés par des virgules (5 au plus). Chacun obtient un appareil pollen, asthme et rhume/grippe.",
+        "de": "Eine oder mehrere 5-stellige US-Postleitzahlen, durch Kommas getrennt (höchstens 5). Jede erhält ein Pollen-, ein Asthma- und ein Erkältungsgerät.",
+        "es": "Uno o varios códigos postales estadounidenses de 5 dígitos, separados por comas (5 como máximo). Cada uno obtiene un dispositivo de polen, asma y resfriado/gripe."
+      },
+      "placeholder": {
+        "en": "e.g. 10001, 80238",
+        "fr": "ex. 10001, 80238",
+        "de": "z. B. 10001, 80238",
+        "es": "p. ej. 10001, 80238"
+      },
+      "required": true
+    },
+    {
+      "key": "poll_frequency",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de rafraîchissement (s)",
+        "de": "Aktualisierungsintervall (s)",
+        "es": "Intervalo de actualización (s)"
+      },
+      "description": {
+        "en": "How often the forecasts are read, in seconds. IQVIA publishes a new forecast once a day.",
+        "fr": "Fréquence de lecture des prévisions, en secondes. IQVIA publie une nouvelle prévision une fois par jour.",
+        "de": "Wie oft die Vorhersagen gelesen werden, in Sekunden. IQVIA veröffentlicht einmal täglich eine neue Vorhersage.",
+        "es": "Frecuencia de lectura de las previsiones, en segundos. IQVIA publica una nueva previsión una vez al día."
+      },
+      "required": false,
+      "default": 3600,
+      "min": 900,
+      "max": 86400
+    }
+  ],
+  "actions": [
+    {
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "timeout_seconds": 45
+    },
+    {
+      "key": "refresh",
+      "label": {
+        "en": "Refresh the forecasts",
+        "fr": "Actualiser les prévisions",
+        "de": "Vorhersagen aktualisieren",
+        "es": "Actualizar las previsiones"
+      },
+      "timeout_seconds": 60
+    }
+  ],
+  "scene_triggers": [
+    {
+      "key": "level_changed",
+      "label": {
+        "en": "Allergy level changed",
+        "fr": "Niveau d'allergie modifié",
+        "de": "Allergiestufe geändert",
+        "es": "Nivel de alergia modificado"
+      },
+      "description": {
+        "en": "Today's level of an IQVIA forecast moved to another band (low, medium, high...).",
+        "fr": "Le niveau du jour d'une prévision IQVIA a changé de palier (faible, moyen, élevé...).",
+        "de": "Die heutige Stufe einer IQVIA-Vorhersage hat gewechselt (niedrig, mittel, hoch...).",
+        "es": "El nivel de hoy de una previsión IQVIA cambió de tramo (bajo, medio, alto...)."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Forecast",
+            "fr": "Prévision",
+            "de": "Vorhersage",
+            "es": "Previsión"
+          }
+        },
+        {
+          "key": "level",
+          "type": "multi_select",
+          "label": {
+            "en": "New level",
+            "fr": "Nouveau niveau",
+            "de": "Neue Stufe",
+            "es": "Nuevo nivel"
+          },
+          "options": [
+            {
+              "value": "low",
+              "label": { "en": "Low", "fr": "Faible", "de": "Niedrig", "es": "Bajo" }
+            },
+            {
+              "value": "low_medium",
+              "label": {
+                "en": "Low-medium",
+                "fr": "Faible à moyen",
+                "de": "Niedrig bis mittel",
+                "es": "Bajo-medio"
+              }
+            },
+            {
+              "value": "medium",
+              "label": { "en": "Medium", "fr": "Moyen", "de": "Mittel", "es": "Medio" }
+            },
+            {
+              "value": "medium_high",
+              "label": {
+                "en": "Medium-high",
+                "fr": "Moyen à élevé",
+                "de": "Mittel bis hoch",
+                "es": "Medio-alto"
+              }
+            },
+            {
+              "value": "high",
+              "label": { "en": "High", "fr": "Élevé", "de": "Hoch", "es": "Alto" }
+            }
+          ]
+        }
+      ],
+      "variables": [
+        {
+          "key": "level",
+          "type": "string",
+          "label": {
+            "en": "New level",
+            "fr": "Nouveau niveau",
+            "de": "Neue Stufe",
+            "es": "Nuevo nivel"
+          }
+        },
+        {
+          "key": "previous_level",
+          "type": "string",
+          "label": {
+            "en": "Previous level",
+            "fr": "Niveau précédent",
+            "de": "Vorherige Stufe",
+            "es": "Nivel anterior"
+          }
+        },
+        {
+          "key": "index",
+          "type": "number",
+          "label": {
+            "en": "Index (0-12)",
+            "fr": "Indice (0-12)",
+            "de": "Index (0-12)",
+            "es": "Índice (0-12)"
+          }
+        },
+        {
+          "key": "forecast",
+          "type": "string",
+          "label": {
+            "en": "Forecast type",
+            "fr": "Type de prévision",
+            "de": "Vorhersageart",
+            "es": "Tipo de previsión"
+          }
+        },
+        {
+          "key": "zip_code",
+          "type": "string",
+          "label": {
+            "en": "ZIP code",
+            "fr": "Code postal",
+            "de": "Postleitzahl",
+            "es": "Código postal"
+          }
+        }
+      ]
+    },
+    {
+      "key": "forecast_updated",
+      "label": {
+        "en": "New daily forecast",
+        "fr": "Nouvelle prévision du jour",
+        "de": "Neue Tagesvorhersage",
+        "es": "Nueva previsión diaria"
+      },
+      "description": {
+        "en": "IQVIA published the forecast of a new day: the moment for a morning notification.",
+        "fr": "IQVIA a publié la prévision d'un nouveau jour : le moment d'une notification matinale.",
+        "de": "IQVIA hat die Vorhersage eines neuen Tages veröffentlicht: Zeit für eine Morgenmeldung.",
+        "es": "IQVIA publicó la previsión de un nuevo día: el momento de una notificación matinal."
+      },
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Forecast",
+            "fr": "Prévision",
+            "de": "Vorhersage",
+            "es": "Previsión"
+          }
+        }
+      ],
+      "variables": [
+        {
+          "key": "forecast",
+          "type": "string",
+          "label": {
+            "en": "Forecast type",
+            "fr": "Type de prévision",
+            "de": "Vorhersageart",
+            "es": "Tipo de previsión"
+          }
+        },
+        {
+          "key": "zip_code",
+          "type": "string",
+          "label": {
+            "en": "ZIP code",
+            "fr": "Code postal",
+            "de": "Postleitzahl",
+            "es": "Código postal"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": { "en": "Location", "fr": "Lieu", "de": "Ort", "es": "Ubicación" }
+        },
+        {
+          "key": "index_today",
+          "type": "number",
+          "label": {
+            "en": "Index today",
+            "fr": "Indice aujourd'hui",
+            "de": "Index heute",
+            "es": "Índice hoy"
+          }
+        },
+        {
+          "key": "level_today",
+          "type": "string",
+          "label": {
+            "en": "Level today",
+            "fr": "Niveau aujourd'hui",
+            "de": "Stufe heute",
+            "es": "Nivel hoy"
+          }
+        },
+        {
+          "key": "index_tomorrow",
+          "type": "number",
+          "label": {
+            "en": "Index tomorrow",
+            "fr": "Indice demain",
+            "de": "Index morgen",
+            "es": "Índice mañana"
+          }
+        },
+        {
+          "key": "level_tomorrow",
+          "type": "string",
+          "label": {
+            "en": "Level tomorrow",
+            "fr": "Niveau demain",
+            "de": "Stufe morgen",
+            "es": "Nivel mañana"
+          }
+        },
+        {
+          "key": "triggers",
+          "type": "string",
+          "label": {
+            "en": "Main allergens / triggers",
+            "fr": "Principaux allergènes / facteurs",
+            "de": "Hauptallergene / Auslöser",
+            "es": "Principales alérgenos / factores"
+          }
+        }
+      ]
+    }
+  ],
+  "scene_actions": [
+    {
+      "key": "get_forecast",
+      "label": {
+        "en": "Get an allergy forecast",
+        "fr": "Obtenir une prévision d'allergie",
+        "de": "Allergievorhersage abrufen",
+        "es": "Obtener una previsión de alergia"
+      },
+      "description": {
+        "en": "Read the index, level and main triggers of a forecast, for today or tomorrow.",
+        "fr": "Lit l'indice, le niveau et les principaux facteurs d'une prévision, pour aujourd'hui ou demain.",
+        "de": "Liest Index, Stufe und Hauptauslöser einer Vorhersage für heute oder morgen.",
+        "es": "Lee el índice, el nivel y los principales factores de una previsión, para hoy o mañana."
+      },
+      "timeout_seconds": 45,
+      "fields": [
+        {
+          "key": "device",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Forecast",
+            "fr": "Prévision",
+            "de": "Vorhersage",
+            "es": "Previsión"
+          },
+          "required": true
+        },
+        {
+          "key": "day",
+          "type": "select",
+          "label": { "en": "Day", "fr": "Jour", "de": "Tag", "es": "Día" },
+          "default": "today",
+          "options": [
+            {
+              "value": "today",
+              "label": { "en": "Today", "fr": "Aujourd'hui", "de": "Heute", "es": "Hoy" }
+            },
+            {
+              "value": "tomorrow",
+              "label": { "en": "Tomorrow", "fr": "Demain", "de": "Morgen", "es": "Mañana" }
+            }
+          ]
+        },
+        {
+          "key": "language",
+          "type": "select",
+          "label": {
+            "en": "Language of the level label",
+            "fr": "Langue du libellé du niveau",
+            "de": "Sprache der Stufenbezeichnung",
+            "es": "Idioma de la etiqueta del nivel"
+          },
+          "default": "en",
+          "options": [
+            {
+              "value": "en",
+              "label": { "en": "English", "fr": "Anglais", "de": "Englisch", "es": "Inglés" }
+            },
+            {
+              "value": "fr",
+              "label": { "en": "French", "fr": "Français", "de": "Französisch", "es": "Francés" }
+            },
+            {
+              "value": "de",
+              "label": { "en": "German", "fr": "Allemand", "de": "Deutsch", "es": "Alemán" }
+            },
+            {
+              "value": "es",
+              "label": { "en": "Spanish", "fr": "Espagnol", "de": "Spanisch", "es": "Español" }
+            }
+          ]
+        }
+      ],
+      "outputs": [
+        {
+          "key": "index",
+          "type": "number",
+          "label": {
+            "en": "Index (0-12)",
+            "fr": "Indice (0-12)",
+            "de": "Index (0-12)",
+            "es": "Índice (0-12)"
+          }
+        },
+        {
+          "key": "level",
+          "type": "string",
+          "label": {
+            "en": "Level key",
+            "fr": "Clé du niveau",
+            "de": "Stufenschlüssel",
+            "es": "Clave del nivel"
+          }
+        },
+        {
+          "key": "level_label",
+          "type": "string",
+          "label": {
+            "en": "Level label",
+            "fr": "Libellé du niveau",
+            "de": "Stufenbezeichnung",
+            "es": "Etiqueta del nivel"
+          }
+        },
+        {
+          "key": "triggers",
+          "type": "string",
+          "label": {
+            "en": "Main allergens / triggers",
+            "fr": "Principaux allergènes / facteurs",
+            "de": "Hauptallergene / Auslöser",
+            "es": "Principales alérgenos / factores"
+          }
+        },
+        {
+          "key": "location",
+          "type": "string",
+          "label": { "en": "Location", "fr": "Lieu", "de": "Ort", "es": "Ubicación" }
+        }
+      ]
+    },
+    {
+      "key": "refresh_forecasts",
+      "label": {
+        "en": "Refresh the allergy forecasts",
+        "fr": "Actualiser les prévisions d'allergie",
+        "de": "Allergievorhersagen aktualisieren",
+        "es": "Actualizar las previsiones de alergia"
+      },
+      "description": {
+        "en": "Read every IQVIA forecast now, without waiting for the refresh interval.",
+        "fr": "Lit toutes les prévisions IQVIA maintenant, sans attendre l'intervalle de rafraîchissement.",
+        "de": "Liest alle IQVIA-Vorhersagen sofort, ohne auf das Aktualisierungsintervall zu warten.",
+        "es": "Lee todas las previsiones IQVIA ahora, sin esperar al intervalo de actualización."
+      },
+      "timeout_seconds": 60,
+      "outputs": [
+        {
+          "key": "refreshed",
+          "type": "number",
+          "label": {
+            "en": "Forecasts refreshed",
+            "fr": "Prévisions actualisées",
+            "de": "Aktualisierte Vorhersagen",
+            "es": "Previsiones actualizadas"
+          }
+        },
+        {
+          "key": "failed",
+          "type": "number",
+          "label": {
+            "en": "Forecasts failed",
+            "fr": "Prévisions en échec",
+            "de": "Fehlgeschlagene Vorhersagen",
+            "es": "Previsiones fallidas"
+          }
+        }
+      ]
+    }
+  ],
+  "widgets": [
+    {
+      "key": "allergy_forecast",
+      "label": {
+        "en": "Allergy forecast",
+        "fr": "Prévisions d'allergie",
+        "de": "Allergievorhersage",
+        "es": "Previsión de alergia"
+      },
+      "description": {
+        "en": "Pollen, asthma and cold & flu indexes of a location, with the next days.",
+        "fr": "Indices pollen, asthme et rhume/grippe d'un lieu, avec les prochains jours.",
+        "de": "Pollen-, Asthma- und Erkältungsindex eines Ortes, mit den nächsten Tagen.",
+        "es": "Índices de polen, asma y resfriado/gripe de un lugar, con los próximos días."
+      },
+      "icon": "wind",
+      "settings": [
+        {
+          "key": "location",
+          "type": "select",
+          "source": "devices",
+          "label": {
+            "en": "Location (any of its forecasts)",
+            "fr": "Lieu (l'une de ses prévisions)",
+            "de": "Ort (eine seiner Vorhersagen)",
+            "es": "Lugar (cualquiera de sus previsiones)"
+          },
+          "description": {
+            "en": "Left empty, the widget shows the first ZIP code of the configuration.",
+            "fr": "Laissé vide, le widget affiche le premier code postal de la configuration.",
+            "de": "Leer gelassen, zeigt das Widget die erste Postleitzahl der Konfiguration.",
+            "es": "Si se deja vacío, el widget muestra el primer código postal de la configuración."
+          }
+        }
+      ],
+      "action_timeout_seconds": 60
+    }
+  ]
+}
