@@ -8,8 +8,8 @@
     "de": "IQVIA-Vorhersagen zu Pollen, Asthma und Erkältung für Ihre US-Postleitzahlen.",
     "es": "Previsiones IQVIA de polen, asma y resfriado/gripe para sus códigos postales de EE. UU."
   },
-  "version": "0.0.0",
-  "docker_image": "ghcr.io/gboulvin/gladys-iqvia-allergy:0.0.0",
+  "version": "1.0.0",
+  "docker_image": "ghcr.io/gboulvin/gladys-iqvia-allergy:1.0.0",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/gboulvin/Gladys-IQVIA-Allergy/main/cover.png",
   "categories": ["environment", "services"],

@@ -10,6 +10,8 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-24
+
 ### Added
 
 - First release of the IQVIA Allergy integration for Gladys Assistant (5.1.0
@@ -30,4 +32,5 @@ the notes of the version's GitHub Release.
 - English, French, German and Spanish texts (manifest, messages, widget and
   documentation).
 
-[Unreleased]: https://github.com/gboulvin/Gladys-IQVIA-Allergy/commits/main
+[Unreleased]: https://github.com/gboulvin/Gladys-IQVIA-Allergy/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/gboulvin/Gladys-IQVIA-Allergy/releases/tag/v1.0.0
